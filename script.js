@@ -1,45 +1,66 @@
-const buttons = document.querySelectorAll('button');
-
-let firstNbrString = '', secondNbrString = '', resultNbrString = '', operatorString = '';
-let operatorStrings = ['plus', 'times', 'divide', 'minus'];
-
-let waitForFirstNumber = true; //If this is true the next number pressed will be added to first number
-let cont = false; //Sets whether calculations continue on previous result or if a new calculation is underway
+const nbrBtns = document.querySelectorAll('.nbrBtn');
+const plusBtn = document.querySelector('#plus');
+const minusBtn = document.querySelector('#minus');
+const timesBtn = document.querySelector('#times');
+const divideBtn = document.querySelector('#divide');
+const equalsBtn = document.querySelector('#equals');
 
 const calcDisplay = document.querySelector('.calc');
 const resultDisplay = document.querySelector('.result');
 
-/*
-*Eventlistenes for all buttons on calculator. 
-*/
-buttons.forEach(button => button.addEventListener('click', () => {
+let firstNbrString = '', secondNbrString = '', resultNbrString = '', operatorString = '';
+let operatorStrings = ['plus', 'times', 'divide', 'minus'];
 
-    if (button.id === 'equals' && !cont && !waitForFirstNumber) { //Will show result if not pressed already and if not waiting for first number
-        resultNbrString = operate(firstNbrString, secondNbrString, operatorString);
-        updateDisplay();
-        firstNbrString = '', secondNbrString = '', operatorString = '';
-        waitForFirstNumber = true;
-        cont = true;
-    } else if (operatorStrings.includes(button.id)) {
-        if (cont) firstNbrString = resultNbrString;
-        cont = false; 
-        operatorString = button.id;
-        waitForFirstNumber = false;
-        updateDisplay();
-    } else if (waitForFirstNumber && button.id !== 'equals') {
-        firstNbrString += button.id;
-        cont = false;
-        updateDisplay();
-    } else if (button.id !== 'equals'){
-        secondNbrString += button.id;
-        updateDisplay();
+let awaitFirstNbr = true;
+let appendToPrevResult = false;
+let canAppendDot = true;
+
+nbrBtns.forEach(button => button.addEventListener('click', () => {
+    if (awaitFirstNbr && !appendToPrevResult) {
+        if (button.id === '.' && canAppendDot) {
+            firstNbrString += button.id;
+            canAppendDot = false;
+        } else if (button.id !== '.') {
+            firstNbrString += button.id;
+        }
+    } else if (appendToPrevResult) {
+        firstNbrString = button.id;
+        appendToPrevResult = false;
     } else {
-        console.log('here');
-        firstNbrString = '', secondNbrString = '', resultNbrString = '', operatorString = '';
-        updateDisplay();
-        cont = false;
-    }
+        if (button.id === '.' && canAppendDot) {
+            secondNbrString += button.id;
+            canAppendDot = false;
+        } else if (button.id !== '.') {
+            secondNbrString += button.id;
+        }
+    } updateDisplay();
 }));
+
+plusBtn.addEventListener('click', handleOperator);
+minusBtn.addEventListener('click', handleOperator);
+timesBtn.addEventListener('click', handleOperator);
+divideBtn.addEventListener('click', handleOperator);
+
+function handleOperator(e) {
+    if ((awaitFirstNbr && firstNbrString !== '') || appendToPrevResult) {
+        awaitFirstNbr = false;
+        appendToPrevResult = false;
+        canAppendDot = true;
+        operatorString = e.target.id;
+        updateDisplay();
+    }
+};
+
+equalsBtn.addEventListener('click', (e) => {
+    if (secondNbrString != '') {
+        resultNbrString = operate(firstNbrString, secondNbrString, operatorString);
+        appendToPrevResult = true;
+        awaitFirstNbr = true;
+        updateDisplay();
+        firstNbrString = resultNbrString;
+        secondNbrString = '', operatorString = '';
+    }
+});
 
 /*
 Updates top and bottom halfs of display with current operation and result
