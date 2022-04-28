@@ -61,6 +61,7 @@ body {
 }
 
 .buttons button {
+    text-align: center;
     -webkit-appearance: none;
     background-color: white;
     border-radius: 20px;
@@ -77,6 +78,6 @@ body {
     transform: scale(0.97);
 }
 
-.equals {
+#equals {
     background-color: rgb(255, 132, 0);
 }

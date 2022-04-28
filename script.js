@@ -15,26 +15,31 @@ let awaitFirstNbr = true;
 let appendToPrevResult = false;
 let canAppendDot = true;
 
-nbrBtns.forEach(button => button.addEventListener('click', () => {
+document.addEventListener('keydown', (e) => handleNbrBtn(document.querySelector(`[id='${e.key}']`).textContent));
+
+nbrBtns.forEach(button => button.addEventListener('click', (button) => handleNbrBtn(button.target.textContent)));
+
+function handleNbrBtn (button) {
     if (awaitFirstNbr && !appendToPrevResult) {
-        if (button.id === '.' && canAppendDot) {
-            firstNbrString += button.id;
+        if (button === '.' && canAppendDot) {
+            firstNbrString += button;
             canAppendDot = false;
-        } else if (button.id !== '.') {
-            firstNbrString += button.id;
+        } else if (button !== '.') {
+            firstNbrString += button;
         }
     } else if (appendToPrevResult) {
-        firstNbrString = button.id;
+        firstNbrString = button;
         appendToPrevResult = false;
     } else {
-        if (button.id === '.' && canAppendDot) {
-            secondNbrString += button.id;
+        if (button === '.' && canAppendDot) {
+            secondNbrString += button;
             canAppendDot = false;
-        } else if (button.id !== '.') {
-            secondNbrString += button.id;
+        } else if (button !== '.') {
+            secondNbrString += button;
         }
     } updateDisplay();
-}));
+
+}
 
 plusBtn.addEventListener('click', handleOperator);
 minusBtn.addEventListener('click', handleOperator);
