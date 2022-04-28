@@ -61,6 +61,7 @@ body {
 }
 
 .buttons button {
+    background-color: white;
     border-radius: 20px;
     width: 75px;
     height: 75px;
