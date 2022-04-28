@@ -15,11 +15,35 @@ let awaitFirstNbr = true;
 let appendToPrevResult = false;
 let canAppendDot = true;
 
-document.addEventListener('keydown', (e) => handleNbrBtn(document.querySelector(`[id='${e.key}']`).textContent));
+//For numpad support
+document.addEventListener('keydown', (e) => {
+    switch (e.key) {
+        case '+':
+            handleOperator('plus');
+            break;
+        case '-':
+            handleOperator('minus');
+            break;
+        case '*':
+            handleOperator('times');
+            break;
+        case '/':
+            handleOperator('divide');
+            break;
+        case 'Enter':
+            handleEquals();
+            break;
+        default:
+            if (!isNaN(e.key)) handleNbrBtn(document.querySelector(`[id='${e.key}']`).textContent);
+    }
+});
 
 nbrBtns.forEach(button => button.addEventListener('click', (button) => handleNbrBtn(button.target.textContent)));
 
-function handleNbrBtn (button) {
+/*
+
+*/
+function handleNbrBtn(button) {
     if (awaitFirstNbr && !appendToPrevResult) {
         if (button === '.' && canAppendDot) {
             firstNbrString += button;
@@ -41,22 +65,23 @@ function handleNbrBtn (button) {
 
 }
 
-plusBtn.addEventListener('click', handleOperator);
-minusBtn.addEventListener('click', handleOperator);
-timesBtn.addEventListener('click', handleOperator);
-divideBtn.addEventListener('click', handleOperator);
+plusBtn.addEventListener('click', (plusBtn) => handleOperator(plusBtn.target.id));
+minusBtn.addEventListener('click', (minusBtn) => handleOperator(minusBtn.target.id));
+timesBtn.addEventListener('click', (timesBtn) => handleOperator(timesBtn.target.id));
+divideBtn.addEventListener('click', (divideBtn) => handleOperator(divideBtn.target.id));
+equalsBtn.addEventListener('click', handleEquals);
 
-function handleOperator(e) {
+function handleOperator(operator) {
     if ((awaitFirstNbr && firstNbrString !== '') || appendToPrevResult) {
         awaitFirstNbr = false;
         appendToPrevResult = false;
         canAppendDot = true;
-        operatorString = e.target.id;
+        operatorString = operator;
         updateDisplay();
     }
 };
 
-equalsBtn.addEventListener('click', (e) => {
+function handleEquals() {
     if (secondNbrString != '') {
         resultNbrString = operate(firstNbrString, secondNbrString, operatorString);
         appendToPrevResult = true;
@@ -65,7 +90,7 @@ equalsBtn.addEventListener('click', (e) => {
         firstNbrString = resultNbrString;
         secondNbrString = '', operatorString = '';
     }
-});
+};
 
 /*
 Updates top and bottom halfs of display with current operation and result
