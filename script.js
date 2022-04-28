@@ -1,3 +1,4 @@
+//All button elements
 const nbrBtns = document.querySelectorAll('.nbrBtn');
 const plusBtn = document.querySelector('#plus');
 const minusBtn = document.querySelector('#minus');
@@ -5,17 +6,26 @@ const timesBtn = document.querySelector('#times');
 const divideBtn = document.querySelector('#divide');
 const equalsBtn = document.querySelector('#equals');
 
+//Top and bottom half of display elements. Top for operation and bottom for result
 const calcDisplay = document.querySelector('.calc');
 const resultDisplay = document.querySelector('.result');
 
 let firstNbrString = '', secondNbrString = '', resultNbrString = '', operatorString = '';
 let operatorStrings = ['plus', 'times', 'divide', 'minus'];
 
-let awaitFirstNbr = true;
-let appendToPrevResult = false;
-let canAppendDot = true;
+let awaitFirstNbr = true; //Makes sure a first number is inputted before operator is
+let appendToPrevResult = false; //If operator is inputted before a new number it will use last result as first number
+let canAppendDot = true; //Stops multiple dots on the same number
 
-//For numpad support
+//Eventlisteners for all buttons (Clicking)
+nbrBtns.forEach(button => button.addEventListener('click', (button) => handleNbrBtn(button.target.textContent)));
+plusBtn.addEventListener('click', (plusBtn) => handleOperator(plusBtn.target.id));
+minusBtn.addEventListener('click', (minusBtn) => handleOperator(minusBtn.target.id));
+timesBtn.addEventListener('click', (timesBtn) => handleOperator(timesBtn.target.id));
+divideBtn.addEventListener('click', (divideBtn) => handleOperator(divideBtn.target.id));
+equalsBtn.addEventListener('click', handleEquals);
+
+//Eventlistener for all buttons (numpad support)
 document.addEventListener('keydown', (e) => {
     switch (e.key) {
         case '+':
@@ -33,15 +43,19 @@ document.addEventListener('keydown', (e) => {
         case 'Enter':
             handleEquals();
             break;
+        case 'Delete': //Reset on delete
+            firstNbrString = '', secondNbrString = '', resultNbrString = '', operatorString = '';
+            awaitFirstNbr = true, appendToPrevResult = false, canAppendDot = true;
+            updateDisplay();
+            break;
         default:
-            if (!isNaN(e.key)) handleNbrBtn(document.querySelector(`[id='${e.key}']`).textContent);
+            if (!isNaN(e.key) || e.key === ',') handleNbrBtn(document.querySelector(`[id='${e.key}']`).textContent);
     }
 });
 
-nbrBtns.forEach(button => button.addEventListener('click', (button) => handleNbrBtn(button.target.textContent)));
-
 /*
-
+Input: Button textcontent
+Updates numbers on display from input.
 */
 function handleNbrBtn(button) {
     if (awaitFirstNbr && !appendToPrevResult) {
@@ -62,15 +76,12 @@ function handleNbrBtn(button) {
             secondNbrString += button;
         }
     } updateDisplay();
-
 }
 
-plusBtn.addEventListener('click', (plusBtn) => handleOperator(plusBtn.target.id));
-minusBtn.addEventListener('click', (minusBtn) => handleOperator(minusBtn.target.id));
-timesBtn.addEventListener('click', (timesBtn) => handleOperator(timesBtn.target.id));
-divideBtn.addEventListener('click', (divideBtn) => handleOperator(divideBtn.target.id));
-equalsBtn.addEventListener('click', handleEquals);
-
+/*
+Input: Operator character.
+Updates display with operator input.
+*/
 function handleOperator(operator) {
     if ((awaitFirstNbr && firstNbrString !== '') || appendToPrevResult) {
         awaitFirstNbr = false;
@@ -81,6 +92,9 @@ function handleOperator(operator) {
     }
 };
 
+/*
+If second number has a value: evaluate operation.
+*/
 function handleEquals() {
     if (secondNbrString != '') {
         resultNbrString = operate(firstNbrString, secondNbrString, operatorString);
@@ -128,7 +142,7 @@ function operate(a, b, operator) {
             return division(Number(a), Number(b));
             break;
         default:
-            console.log('default operator case');
+            console.warn('Default operator case, something is wrong');
     }
 }
 
