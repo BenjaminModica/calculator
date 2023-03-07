@@ -1,5 +1,5 @@
 # calculator
-Browser calculator.
+Browser Calculator.
 
 Has numpad support and delete key clears the display.
 
